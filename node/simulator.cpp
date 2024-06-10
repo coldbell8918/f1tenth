@@ -39,7 +39,7 @@ private:
     ros::NodeHandle n;
 
     // The transformation frames used
-    std::string map_frame, base_frame, scan_frame;
+    std::string map_frame, base_frame, scan_frame, odom_frame, second_frame;
 
     // obstacle states (1D index) and parameters
     std::vector<int> added_obs;
@@ -160,6 +160,8 @@ public:
         n.getParam("map_frame", map_frame);
         n.getParam("base_frame", base_frame);
         n.getParam("scan_frame", scan_frame);
+        n.getParam("odom_frame", odom_frame);
+        n.getParam("second_frame", second_frame);
 
         // Fetch the car parameters
         int scan_beams;
@@ -624,7 +626,7 @@ public:
 
             // publish ground truth pose
             geometry_msgs::PoseStamped ps;
-            ps.header.frame_id = "/map";
+            ps.header.frame_id = map_frame;
             ps.pose.position.x = state.x;
             ps.pose.position.y = state.y;
             ps.pose.orientation.x = quat.x();
@@ -637,11 +639,19 @@ public:
             ts.transform = t;
             ts.header.stamp = timestamp;
             ts.header.frame_id = map_frame;
-            ts.child_frame_id = base_frame;
+            ts.child_frame_id = odom_frame;
+
+            // Add a header to the transformation
+            geometry_msgs::TransformStamped ts2;
+            ts2.transform = t;
+            ts2.header.stamp = timestamp;
+            ts2.header.frame_id = odom_frame;
+            ts2.child_frame_id = base_frame;
 
             // Publish them
             if (broadcast_transform) {
                 br.sendTransform(ts);
+                br.sendTransform(ts2);
             }
             if (pub_gt_pose) {
                 pose_pub.publish(ps);
@@ -674,7 +684,7 @@ public:
             scan_ts.transform.rotation.w = 1;
             scan_ts.header.stamp = timestamp;
             scan_ts.header.frame_id = base_frame;
-            scan_ts.child_frame_id = scan_frame;
+            scan_ts.child_frame_id = second_frame;
             br.sendTransform(scan_ts);
         }
 
@@ -682,7 +692,7 @@ public:
             // Make an odom message and publish it
             nav_msgs::Odometry odom;
             odom.header.stamp = timestamp;
-            odom.header.frame_id = map_frame;
+            odom.header.frame_id = odom_frame;
             odom.child_frame_id = base_frame;
             odom.pose.pose.position.x = state.x;
             odom.pose.pose.position.y = state.y;

@@ -6,8 +6,10 @@
   <arg name="racecar_xacro" default="$(find f1tenth_simulator)/racecar.xacro"/>
   <!--<param name="tf_prefix" value="racecar"/>-->
   <param name="robot_description" command="xacro --inorder '$(arg racecar_xacro)'"/>
+
+  <include file="$(find f1tenth_simulator)/launch/racecar_remote.launch"/>
   <!-- Add the transformations -->
-  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
+  <!-- <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" /> -->
   </group>
 
 </launch>

@@ -115,8 +115,10 @@ collision_file: "collision_file"
 
 # The names of the transformation frames published to
 map_frame: "map"
-base_frame: "base_link"
-scan_frame: "laser"
+base_frame: "base_footprint"
+second_frame: "base_link"
+scan_frame: "base_scan"
+odom_frame: "odom"
 
 broadcast_transform: true
 publish_ground_truth_pose: true
