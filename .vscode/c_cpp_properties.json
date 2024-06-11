@@ -1,0 +1,32 @@
+{
+  "configurations": [
+    {
+      "browse": {
+        "databaseFilename": "${default}",
+        "limitSymbolsToIncludedHeaders": false
+      },
+      "includePath": [
+        "/home/park/catkin_ws/devel/include/**",
+        "/opt/ros/noetic/include/**",
+        "/home/park/catkin_ws/src/interceptor_drone/include/**",
+        "/home/park/catkin_ws/src/carrier_ros/carrier_ros_map_export/include/**",
+        "/home/park/catkin_ws/src/carrier_ros/carrier_ros_perception/include/**",
+        "/home/park/catkin_ws/src/carrier_ros/carrier_ros_slam/include/**",
+        "/home/park/catkin_ws/src/f1tenth/include/**",
+        "/home/park/catkin_ws/src/aruco_marker/fiducial_slam/include/**",
+        "/home/park/catkin_ws/src/obstacle_detector/include/**",
+        "/home/park/catkin_ws/src/aruco_marker/stag_detect/include/**",
+        "/home/park/catkin_ws/src/teleop_ardrone/include/**",
+        "/home/park/catkin_ws/src/turtlebot3_simulations/turtlebot3_fake/include/**",
+        "/home/park/catkin_ws/src/turtlebot3_simulations/turtlebot3_gazebo/include/**",
+        "/usr/include/**"
+      ],
+      "name": "ROS",
+      "intelliSenseMode": "gcc-x64",
+      "compilerPath": "/usr/bin/gcc",
+      "cStandard": "gnu11",
+      "cppStandard": "c++14"
+    }
+  ],
+  "version": 4
+}

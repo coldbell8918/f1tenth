@@ -343,8 +343,10 @@ public:
         // Make an odom message as well and publish it
         pub_odom(timestamp);
 
+        pub_odom_transform(timestamp);
+
         // TODO: make and publish IMU message
-        pub_imu(timestamp);
+        // pub_imu(timestamp);
 
 
         /// KEEP in sim
@@ -641,17 +643,11 @@ public:
             ts.header.frame_id = map_frame;
             ts.child_frame_id = odom_frame;
 
-            // Add a header to the transformation
-            geometry_msgs::TransformStamped ts2;
-            ts2.transform = t;
-            ts2.header.stamp = timestamp;
-            ts2.header.frame_id = odom_frame;
-            ts2.child_frame_id = base_frame;
 
             // Publish them
             if (broadcast_transform) {
                 br.sendTransform(ts);
-                br.sendTransform(ts2);
+                // br.sendTransform(ts2);
             }
             if (pub_gt_pose) {
                 pose_pub.publish(ps);
@@ -707,16 +703,33 @@ public:
             odom_pub.publish(odom);
         }
 
-        void pub_imu(ros::Time timestamp) {
-            // Make an IMU message and publish it
-            // TODO: make imu message
-            sensor_msgs::Imu imu;
-            imu.header.stamp = timestamp;
-            imu.header.frame_id = map_frame;
-
-
-            imu_pub.publish(imu);
+        void pub_odom_transform(ros::Time timestamp) {
+            // Publish a transformation between base link and laser
+            geometry_msgs::TransformStamped odom_ts;
+            odom_ts.transform.translation.x = state.x;
+            odom_ts.transform.translation.y = state.y;
+            tf2::Quaternion quat;
+            quat.setEuler(0., 0., state.theta);
+            odom_ts.transform.rotation.x = quat.x();
+            odom_ts.transform.rotation.y = quat.y();
+            odom_ts.transform.rotation.z = quat.z();
+            odom_ts.transform.rotation.w = quat.w();
+            odom_ts.header.stamp = timestamp;
+            odom_ts.header.frame_id = odom_frame;
+            odom_ts.child_frame_id = base_frame;
+            br.sendTransform(odom_ts);
         }
+
+        // void pub_imu(ros::Time timestamp) {
+        //     // Make an IMU message and publish it
+        //     // TODO: make imu message
+        //     sensor_msgs::Imu imu;
+        //     imu.header.stamp = timestamp;
+        //     imu.header.frame_id = map_frame;
+
+
+        //     imu_pub.publish(imu);
+        // }
 
 };
 
