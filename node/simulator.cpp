@@ -39,7 +39,7 @@ private:
     ros::NodeHandle n;
 
     // The transformation frames used
-    std::string map_frame, base_frame, scan_frame, odom_frame, second_frame;
+    std::string map_frame, base_frame, scan_frame, odom_frame;
 
     // obstacle states (1D index) and parameters
     std::vector<int> added_obs;
@@ -161,7 +161,7 @@ public:
         n.getParam("base_frame", base_frame);
         n.getParam("scan_frame", scan_frame);
         n.getParam("odom_frame", odom_frame);
-        n.getParam("second_frame", second_frame);
+        
 
         // Fetch the car parameters
         int scan_beams;
@@ -343,7 +343,7 @@ public:
         // Make an odom message as well and publish it
         pub_odom(timestamp);
 
-        pub_odom_transform(timestamp);
+        // pub_odom_transform(timestamp);
 
         // TODO: make and publish IMU message
         // pub_imu(timestamp);
@@ -636,21 +636,44 @@ public:
             ps.pose.orientation.z = quat.z();
             ps.pose.orientation.w = quat.w();
 
+            // publish ground truth pose
+            geometry_msgs::PoseStamped ps2;
+            ps2.header.frame_id = odom_frame;
+            ps2.pose.position.x = state.x;
+            ps2.pose.position.y = state.y;
+            ps2.pose.orientation.x = quat.x();
+            ps2.pose.orientation.y = quat.y();
+            ps2.pose.orientation.z = quat.z();
+            ps2.pose.orientation.w = quat.w();
+    
             // Add a header to the transformation
             geometry_msgs::TransformStamped ts;
-            ts.transform = t;
+            ts.transform.translation.x = 0.0;
+            ts.transform.translation.x = 0.0;
+            ts.transform.rotation.x = 0.0;
+            ts.transform.rotation.y = 0.0;
+            ts.transform.rotation.z = 0.0;
+            ts.transform.rotation.w = 1.0;
             ts.header.stamp = timestamp;
             ts.header.frame_id = map_frame;
             ts.child_frame_id = odom_frame;
+
+            // Add a header to the transformation
+            geometry_msgs::TransformStamped ts2;
+            ts2.transform = t;
+            ts2.header.stamp = timestamp;
+            ts2.header.frame_id = odom_frame;
+            ts2.child_frame_id = base_frame;
 
 
             // Publish them
             if (broadcast_transform) {
                 br.sendTransform(ts);
-                // br.sendTransform(ts2);
+                br.sendTransform(ts2);
             }
             if (pub_gt_pose) {
                 pose_pub.publish(ps);
+                pose_pub.publish(ps2);
             }
         }
 
@@ -680,7 +703,7 @@ public:
             scan_ts.transform.rotation.w = 1;
             scan_ts.header.stamp = timestamp;
             scan_ts.header.frame_id = base_frame;
-            scan_ts.child_frame_id = second_frame;
+            scan_ts.child_frame_id = scan_frame;
             br.sendTransform(scan_ts);
         }
 
@@ -703,22 +726,22 @@ public:
             odom_pub.publish(odom);
         }
 
-        void pub_odom_transform(ros::Time timestamp) {
-            // Publish a transformation between base link and laser
-            geometry_msgs::TransformStamped odom_ts;
-            odom_ts.transform.translation.x = state.x;
-            odom_ts.transform.translation.y = state.y;
-            tf2::Quaternion quat;
-            quat.setEuler(0., 0., state.theta);
-            odom_ts.transform.rotation.x = quat.x();
-            odom_ts.transform.rotation.y = quat.y();
-            odom_ts.transform.rotation.z = quat.z();
-            odom_ts.transform.rotation.w = quat.w();
-            odom_ts.header.stamp = timestamp;
-            odom_ts.header.frame_id = odom_frame;
-            odom_ts.child_frame_id = base_frame;
-            br.sendTransform(odom_ts);
-        }
+        // void pub_odom_transform(ros::Time timestamp) {
+        //     // Publish a transformation between base link and laser
+        //     geometry_msgs::TransformStamped odom_ts;
+        //     odom_ts.transform.translation.x = state.x;
+        //     odom_ts.transform.translation.y = state.y;
+        //     tf2::Quaternion quat;
+        //     quat.setEuler(0., 0., state.theta);
+        //     odom_ts.transform.rotation.x = quat.x();
+        //     odom_ts.transform.rotation.y = quat.y();
+        //     odom_ts.transform.rotation.z = quat.z();
+        //     odom_ts.transform.rotation.w = quat.w();
+        //     odom_ts.header.stamp = timestamp;
+        //     odom_ts.header.frame_id = map_frame;
+        //     odom_ts.child_frame_id = odom_frame;
+        //     br.sendTransform(odom_ts);
+        // }
 
         // void pub_imu(ros::Time timestamp) {
         //     // Make an IMU message and publish it
