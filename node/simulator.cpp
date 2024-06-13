@@ -702,7 +702,7 @@ public:
             scan_ts.transform.translation.x = scan_distance_to_base_link;
             scan_ts.transform.rotation.w = 1;
             scan_ts.header.stamp = timestamp;
-            scan_ts.header.frame_id = base_frame;
+            scan_ts.header.frame_id = "base_link";
             scan_ts.child_frame_id = scan_frame;
             br.sendTransform(scan_ts);
         }
